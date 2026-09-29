@@ -1,0 +1,11 @@
+# Combat dialogue templates, keyed by StatState. Uses <player>/<enemy> placeholders.
+AHEAD|You strike true! <enemy> could not withstand your strength.
+AHEAD|<player> presses the advantage and brings <enemy> down.
+BEHIND|<enemy> overwhelms you. You stagger back in defeat.
+BEHIND|Your attack falls short - <enemy> proves too strong.
+WAY_AHEAD|<player> crushes <enemy> effortlessly, barely breaking a sweat.
+WAY_AHEAD|<enemy> never stood a chance against <player>'s might.
+AGILITY_CLUTCH|Just as <enemy> gains the upper hand, <player>'s swift reflexes turn the tide!
+AGILITY_CLUTCH|<player> barely dodges the killing blow and turns it into victory.
+AGILITY_CLUTCH|<player> weaves through a flurry of attacks with a series of complex maneuvers, turning defense into triumph.
+AGILITY_CLUTCH|A single well-timed dodge is all <player> needed to seize victory from <enemy>.
