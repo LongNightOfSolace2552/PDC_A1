@@ -23,7 +23,7 @@ BattleStagePanel. Skip shows the rest at once; Continue hands the result
 back to the caller.
 */
 public class CombatPanel extends JPanel {
-    private final BattleStagePanel stage = new BattleStagePanel();
+    private final BattleDisplayPanel stage = new BattleDisplayPanel();
     private final JTextArea logArea = new JTextArea(8, 40);
     private final JButton actionButton = new JButton("Skip");
     private final CombatSequencer sequencer = new CombatSequencer();
