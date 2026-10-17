@@ -16,10 +16,14 @@ public class DialogueServiceImpl implements DialogueService {
     /*
     returns the full, ready-to-output dialogue lines for the given
     StatState, with the player's and enemy's names filled in.
+    
+    modified: change ' .get ' with ' .getOrDefault ', retrieves the key of a
+    specific value map or it returns a default fallback value if the key
+    does not exist.
     */
     @Override
     public List<String> buildBattleLines(StatState statState, String playerName, String enemyName) {
-        List<DialogueTemplate> templates = templatesByState.get(statState);
+        List<DialogueTemplate> templates = templatesByState.getOrDefault(statState, List.of());
         List<String> lines = new ArrayList<>();
         for (DialogueTemplate template : templates) {
             lines.add(template.format(playerName, enemyName));
