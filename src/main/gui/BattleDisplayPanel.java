@@ -13,7 +13,7 @@ and back, a dodge moves the dodger sideways away and back, and when the
 fight ends the loser turns grey. the Swing Timer only runs while a move
 is in progress.
 */
-public class BattleStagePanel extends JPanel {
+public class BattleDisplayPanel extends JPanel {
     private static final int MOVE_MILLIS = 350;
     private static final int MOVE_DISTANCE = 45;
     private static final int TICK_MILLIS = 20;
