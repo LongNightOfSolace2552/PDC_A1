@@ -1,15 +1,12 @@
 package main.config;
 
+/*removed all the cui required imports, some files like renderers is not needed
+as it is rendered in a GUI now.*/
 import java.util.List;
 import java.util.Map;
-import main.core.CombatSequencer;
 import main.core.Game;
 import main.core.GameController;
 import main.core.SaveManager;
-import main.cui.CombatRenderer;
-import main.cui.CommandParser;
-import main.cui.ConsoleRenderer;
-import main.cui.MenuRenderer;
 import main.domain.combat.Boss;
 import main.domain.combat.DialogueTemplate;
 import main.domain.combat.DialogueTemplate.StatState;
@@ -64,16 +61,10 @@ public class AppConfig {
         DialogueService dialogueService = new DialogueServiceImpl(templatesByState);
 
         CombatService combatService = new CombatServiceImpl(randomizer, itemCatalog, dialogueService);
-        CombatRenderer combatRenderer = new CombatRenderer();
-        CombatSequencer combatSequencer = new CombatSequencer(combatRenderer);
 
-        ConsoleRenderer consoleRenderer = new ConsoleRenderer();
-        MenuRenderer menuRenderer = new MenuRenderer();
-        CommandParser commandParser = new CommandParser();
+        GameController gameController = new GameController(saveManager, travelService, combatService,
+                enemyPoolsByNode, bossesByNode, randomizer);
 
-        GameController gameController = new GameController(consoleRenderer, commandParser, saveManager,
-                travelService, combatService, combatSequencer, enemyPoolsByNode, bossesByNode, randomizer);
-
-        return new Game(consoleRenderer, menuRenderer, commandParser, gameController, saveManager, itemCatalog);
+        return new Game(gameController, saveManager, itemCatalog);
     }
 }
