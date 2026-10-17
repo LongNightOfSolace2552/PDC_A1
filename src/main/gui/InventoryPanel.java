@@ -22,11 +22,13 @@ import main.domain.player.Stats;
 import main.services.ActionResult;
 
 /*
-the Stats / Inventory screen: stat totals (base + equipment bonuses),
+the Stats/Inventory screen: stat totals (base + equipment bonuses),
 equipped weapon and accessory, stat point allocation and the inventory.
 a button only appears when its action is possible: Equip for each item
 in the inventory, Unequip for a filled slot, the allocate buttons while
-there are points to spend. the rules themselves are GameController's.
+there are points to spend. the rules themselves are GameController.
+
+Some functionality are extracted from the Project 1's inventory's functionality.
 */
 public class InventoryPanel extends JPanel {
     private static final int EQUIPPED_TEXT_WIDTH = 320;
@@ -75,6 +77,16 @@ public class InventoryPanel extends JPanel {
         bottom.add(backButton);
         add(bottom, BorderLayout.SOUTH);
     }
+    
+    /*update the inventory*/
+    public void refresh(){
+        refreshStats();
+        refreshEquipped();
+        refreshAllocate();
+        refreshInventory();
+        revalidate();
+        repaint();
+    }
 
     private JLabel heading(String text) {
         JLabel label = new JLabel(text);
@@ -90,7 +102,8 @@ public class InventoryPanel extends JPanel {
         Stats base = player.getStats();
         Item weapon = player.getEquippedWeapon();
         Item accessory = player.getEquippedAccessory();
-
+        
+        /*creates stats display label for panel*/
         statsSection.add(new JLabel(statLine("Strength", base.getStrength(), weapon, accessory, Item::getStrengthBonus)));
         statsSection.add(new JLabel(statLine("Magic", base.getMagic(), weapon, accessory, Item::getMagicBonus)));
         statsSection.add(new JLabel(statLine("Agility", base.getAgility(), weapon, accessory, Item::getAgilityBonus)));
