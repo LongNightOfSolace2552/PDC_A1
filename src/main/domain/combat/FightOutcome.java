@@ -8,6 +8,11 @@ the msseage can be worded without reforming the rules.
 built statically.
 */
 public class FightOutcome {
-    private boolean winning;
+    private final boolean has_won;
+    private final boolean floorAdvanced;
+    private final boolean progressReset;
+    private final boolean bossDefeated;
+    private final int floor;
+    
     
 }
