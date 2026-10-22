@@ -55,7 +55,7 @@ public class DialogueFileRepository {
         List<String> result = new ArrayList<>();
         for (String line : fileReaderUtil.readLines(DIALOGUE_TEMPLATES_PATH)) {
             String trimmed = line.trim();
-            if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+            if (trimmed.isEmpty()||trimmed.startsWith("#")) {
                 continue;
             }
             result.add(trimmed);
