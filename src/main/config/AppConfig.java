@@ -2,6 +2,8 @@ package main.config;
 
 /*removed all the cui required imports, some files like renderers is not needed
 as it is rendered in a GUI now.*/
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import main.core.Game;
@@ -14,13 +16,14 @@ import main.domain.combat.Enemy;
 import main.domain.items.Item;
 import main.domain.world.Node;
 import main.exceptions.DataLoadException;
-import main.persistence.DialogueFileRepository;
-import main.persistence.EnemyFileRepository;
-import main.persistence.FileReaderUtil;
-import main.persistence.FileWriterUtil;
-import main.persistence.ItemFileRepository;
-import main.persistence.NodeFileRepository;
-import main.persistence.PlayerFileRepository;
+import main.persistence.DatabaseCreateTables;
+import main.persistence.DatabaseInsertData;
+import main.persistence.DatabaseManager;
+import main.persistence.DialogueDatabaseRepository;
+import main.persistence.EnemyDatabaseRepository;
+import main.persistence.ItemDatabaseRepository;
+import main.persistence.NodeDatabaseRepository;
+import main.persistence.PlayerDatabaseRepository;
 import main.services.combat.CombatService;
 import main.services.combat.CombatServiceImpl;
 import main.services.combat.DialogueService;
@@ -31,33 +34,45 @@ import main.util.Randomizer;
 
 /* dependency wiring for services and repositories. */
 public class AppConfig {
+    // Connects to embedded Derby database, creates on first run,
+    // makes sure every table exists and fill data if they are empty.
+    private Connection openDatabase() throws DataLoadException {
+        try {
+            Connection connection = DatabaseManager.getManager().getConnection();
+            new DatabaseCreateTables().createTables(connection);
+            new DatabaseInsertData().insertData(connection);
+            return connection;
+        } catch (SQLException e) {
+            throw new DataLoadException("Could not open or set up the database.", e);
+        }
+    }    
+    
     /*
     builds every service and its dependencies in one place.
     Classes in the upper inheritance tree only depend on the
     abstractions and collaborator needed
     */
     public Game buildGame() throws DataLoadException {
-        FileReaderUtil fileReaderUtil = new FileReaderUtil();
-        FileWriterUtil fileWriterUtil = new FileWriterUtil();
         Randomizer randomizer = new Randomizer();
+        Connection connection= openDatabase();
 
-        ItemFileRepository itemFileRepository = new ItemFileRepository(fileReaderUtil);
-        Map<String, Item> itemCatalog = itemFileRepository.loadItemCatalog();
+        ItemDatabaseRepository itemDatabaseRepository = new ItemDatabaseRepository(connection);
+        Map<String, Item> itemCatalog = itemDatabaseRepository.loadItemCatalog();
 
-        PlayerFileRepository playerFileRepository =
-                new PlayerFileRepository(fileReaderUtil, fileWriterUtil, itemCatalog);
-        SaveManager saveManager = new SaveManager(playerFileRepository);
+        PlayerDatabaseRepository playerDatabaseRepository =
+                new PlayerDatabaseRepository(connection,itemCatalog);
+        SaveManager saveManager = new SaveManager(playerDatabaseRepository);
 
-        NodeFileRepository nodeFileRepository = new NodeFileRepository(fileReaderUtil);
-        List<Node> nodes = nodeFileRepository.loadNodes();
+        NodeDatabaseRepository nodeDatabaseRepository = new NodeDatabaseRepository(connection);
+        List<Node> nodes = nodeDatabaseRepository.loadNodes();
         TravelService travelService = new TravelServiceImpl(nodes);
 
-        EnemyFileRepository enemyFileRepository = new EnemyFileRepository(fileReaderUtil);
-        Map<String, List<Enemy>> enemyPoolsByNode = enemyFileRepository.loadEnemyPoolsByNode();
-        Map<String, Boss> bossesByNode = enemyFileRepository.loadBosses();
+        EnemyDatabaseRepository enemyDatabaseRepository = new EnemyDatabaseRepository(connection);
+        Map<String, List<Enemy>> enemyPoolsByNode = enemyDatabaseRepository.loadEnemyPoolsByNode();
+        Map<String, Boss> bossesByNode = enemyDatabaseRepository.loadBosses();
 
-        DialogueFileRepository dialogueFileRepository = new DialogueFileRepository(fileReaderUtil);
-        Map<StatState, List<DialogueTemplate>> templatesByState = dialogueFileRepository.loadDialogueTemplates();
+        DialogueDatabaseRepository dialogueDatabaseRepository = new DialogueDatabaseRepository(connection);
+        Map<StatState, List<DialogueTemplate>> templatesByState = dialogueDatabaseRepository.loadDialogueTemplates();
         DialogueService dialogueService = new DialogueServiceImpl(templatesByState);
 
         CombatService combatService = new CombatServiceImpl(randomizer, itemCatalog, dialogueService);

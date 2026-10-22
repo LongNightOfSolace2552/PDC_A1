@@ -18,6 +18,23 @@ import main.exceptions.SaveDataException;
    PLAYER_DEFEATED_BOSS tables.
    Structure drafted with AI assistance (Claude) - see AI usage log. */
 public class PlayerDatabaseRepository {
+    
+        private static final String UPDATE_PLAYER =
+            "UPDATE PLAYER SET STRENGTH = ?, MAGIC = ?, AGILITY = ?, CURRENT_NODE_ID = ?, "
+            + "EQUIPPED_WEAPON = ?, EQUIPPED_ACCESSORY = ?, UNALLOCATED_STAT_POINTS = ? WHERE NAME = ?";
+    private static final String INSERT_PLAYER =
+            "INSERT INTO PLAYER (STRENGTH, MAGIC, AGILITY, CURRENT_NODE_ID, "
+            + "EQUIPPED_WEAPON, EQUIPPED_ACCESSORY, UNALLOCATED_STAT_POINTS, NAME) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String DELETE_INVENTORY =
+            "DELETE FROM PLAYER_INVENTORY WHERE PLAYER_NAME = ?";
+    private static final String INSERT_INVENTORY =
+            "INSERT INTO PLAYER_INVENTORY (PLAYER_NAME, ITEM_ID) VALUES (?, ?)";
+    private static final String DELETE_DEFEATED_BOSSES =
+            "DELETE FROM PLAYER_DEFEATED_BOSS WHERE PLAYER_NAME = ?";
+    private static final String INSERT_DEFEATED_BOSS =
+            "INSERT INTO PLAYER_DEFEATED_BOSS (PLAYER_NAME, NODE_ID) VALUES (?, ?)";
+    
     private static final String COUNT_PLAYER =
             "SELECT COUNT(*) FROM PLAYER WHERE NAME = ?";
     private static final String SELECT_PLAYER =
@@ -113,5 +130,95 @@ public class PlayerDatabaseRepository {
             throw new SaveDataException("Save references an unknown item: " + itemId);
         }
         return item;
+    }
+    
+    /* writes the player and everything they own as one transaction:
+       either all three tables are saved, or none are. */
+    public void save(Player player, String name) throws SaveDataException {
+        try {
+            connection.setAutoCommit(false);
+            writePlayerRow(player, name);
+            replaceInventory(player, name);
+            replaceDefeatedBosses(player, name);
+            connection.commit();
+        } catch (SQLException e) {
+            rollbackQuietly();
+            throw new SaveDataException("Could not save player " + name + " to the database", e);
+        } finally {
+            restoreAutoCommit();
+        }
+    }
+
+    /* UPDATE first; if no row matched (executeUpdate returned 0) it's a new player. */
+    private void writePlayerRow(Player player, String name) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(UPDATE_PLAYER)) {
+            bindPlayerColumns(ps, player, name);
+            if (ps.executeUpdate() > 0) {
+                return;
+            }
+        }
+        try (PreparedStatement ps = connection.prepareStatement(INSERT_PLAYER)) {
+            bindPlayerColumns(ps, player, name);
+            ps.executeUpdate();
+        }
+    }
+
+    /* UPDATE_PLAYER and INSERT_PLAYER list their ? in the same order, so one
+       helper fills both. setString(n, null) stores SQL NULL (nothing equipped). */
+    private void bindPlayerColumns(PreparedStatement ps, Player player, String name) throws SQLException {
+        ps.setInt(1, player.getStats().getStrength());
+        ps.setInt(2, player.getStats().getMagic());
+        ps.setInt(3, player.getStats().getAgility());
+        ps.setString(4, player.getCurrentNodeId());
+        ps.setString(5, player.hasEquippedWeapon() ? player.getEquippedWeapon().getId() : null);
+        ps.setString(6, player.hasEquippedAccessory() ? player.getEquippedAccessory().getId() : null);
+        ps.setInt(7, player.getUnallocatedStatPoints());
+        ps.setString(8, name);
+    }
+
+    /* getInventory() holds only unequipped items; equipped ones live in the PLAYER row. */
+    private void replaceInventory(Player player, String name) throws SQLException {
+        deleteRowsFor(DELETE_INVENTORY, name);
+        try (PreparedStatement ps = connection.prepareStatement(INSERT_INVENTORY)) {
+            for (Item item : player.getInventory()) {
+                ps.setString(1, name);
+                ps.setString(2, item.getId());
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private void replaceDefeatedBosses(Player player, String name) throws SQLException {
+        deleteRowsFor(DELETE_DEFEATED_BOSSES, name);
+        try (PreparedStatement ps = connection.prepareStatement(INSERT_DEFEATED_BOSS)) {
+            for (String nodeId : player.getDefeatedBossNodeIds()) {
+                ps.setString(1, name);
+                ps.setString(2, nodeId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private void deleteRowsFor(String sql, String name) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.executeUpdate();
+        }
+    }
+
+    private void rollbackQuietly() {
+        try {
+            connection.rollback();
+        } catch (SQLException ignored) {
+            /* nothing more can be done; the original error is the one to report */
+        }
+    }
+
+    private void restoreAutoCommit() {
+        try {
+            connection.setAutoCommit(true);
+        } catch (SQLException ignored) {
+            /* same reason as rollbackQuietly */
+        }
     }
 }
