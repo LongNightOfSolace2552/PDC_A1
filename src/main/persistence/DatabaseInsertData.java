@@ -143,20 +143,20 @@ public class DatabaseInsertData {
                 + "STAT_DROP_CHANCE, STAT_DROP_MIN, STAT_DROP_MAX, ITEM_DROP_CHANCE, ITEM_DROP_ID) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            insertEnemyRows(ps, "village", "slime", "MONSTER", "Slime", 4, 2, 1, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "village", "bandit", "MONSTER", "Bandit", 6, 3, 3, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "village", "wolf", "MONSTER", "Dire Wolf", 5, 5, 6, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "village", "village_boss", "BOSS", "Village Chieftain", 20, 12, 8, 1.0, 2, 3, 0, null);
+            insertEnemyRows(ps, "village", "slime", "MONSTER", "Slime", 3, 1, 1, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "village", "bandit", "MONSTER", "Bandit", 4, 2, 2, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "village", "wolf", "MONSTER", "Dire Wolf", 4, 3, 3, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "village", "village_boss", "BOSS", "Village Chieftain", 12, 8, 5, 1.0, 2, 3, 0, null);
 
-            insertEnemyRows(ps, "forest", "slime", "MONSTER", "Slime", 8, 4, 2, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "forest", "bandit", "MONSTER", "Bandit", 12, 6, 6, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "forest", "wolf", "MONSTER", "Dire Wolf", 24, 10, 12, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "forest", "forest_boss", "BOSS", "Forest Guardian", 25, 35, 15, 1.0, 2, 3, 0, null);
+            insertEnemyRows(ps, "forest", "slime", "MONSTER", "Slime", 6, 3, 2, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "forest", "bandit", "MONSTER", "Bandit", 8, 4, 4, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "forest", "wolf", "MONSTER", "Dire Wolf", 12, 6, 8, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "forest", "forest_boss", "BOSS", "Forest Guardian", 20, 20, 10, 1.0, 2, 3, 0, null);
 
-            insertEnemyRows(ps, "cave", "slime", "MONSTER", "Slime", 16, 8, 4, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "cave", "bandit", "MONSTER", "Bandit", 24, 12, 12, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "cave", "wolf", "MONSTER", "Dire Wolf", 48, 20, 24, 0.6, 1, 2, 0.15, null);
-            insertEnemyRows(ps, "cave", "cave_boss", "BOSS", "Cave Dweller", 60, 60, 25, 1.0, 2, 3, 0, null);
+            insertEnemyRows(ps, "cave", "slime", "MONSTER", "Slime", 10, 5, 3, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "cave", "bandit", "MONSTER", "Bandit", 15, 8, 8, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "cave", "wolf", "MONSTER", "Dire Wolf", 24, 12, 14, 0.6, 1, 2, 0.15, null);
+            insertEnemyRows(ps, "cave", "cave_boss", "BOSS", "Cave Dweller", 50, 45, 20, 1.0, 2, 3, 0, null);
         }
     }
     
