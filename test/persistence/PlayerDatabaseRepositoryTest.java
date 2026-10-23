@@ -162,5 +162,70 @@ public class PlayerDatabaseRepositoryTest {
         repository.load("Nobody");
     }
 
-    /*WIP*/
+    @Test
+    public void load_failsWhenTheSaveHoldsAnItemTheCatalogDoesNotKnow() throws SaveDataException {
+        Player player = new Player("Hero", new Stats(0, 0, 0), "village");
+        player.addItem(catalog.get("silver_ring"));
+        repository.save(player, "Hero");
+
+        Map<String, Item> smallerCatalog = new HashMap<>(catalog);
+        smallerCatalog.remove("silver_ring");
+        PlayerDatabaseRepository strictRepository =
+                new PlayerDatabaseRepository(database.connection(), smallerCatalog);
+
+        try {
+            strictRepository.load("Hero");
+            fail("an unknown item should make the load fail");
+        } catch (SaveDataException e) {
+            assertTrue(e.getMessage().contains("silver_ring"));
+        }
+    }
+
+    /*
+    the save is one transaction: if the inventory cannot be written, the
+    changes already made to the PLAYER row must not stay behind.
+    */
+    @Test
+    public void save_thatFailsHalfWay_leavesThePreviousSaveUntouched() throws Exception {
+        Player player = new Player("Hero", new Stats(1, 1, 1), "village");
+        player.addItem(catalog.get("iron_sword"));
+        repository.save(player, "Hero");
+
+        player.getStats().setStrength(99);
+        player.setCurrentNodeId("cave");
+        /* an item the ITEM table has never heard of: the inventory insert is refused. */
+        player.addItem(new Weapon("ghost_blade", "Ghost Blade", 1, 0, 0, null, CombatStyle.MELEE));
+        try {
+            repository.save(player, "Hero");
+            fail("saving an item that is not in the ITEM table should fail");
+        } catch (SaveDataException expected) {
+            assertNotNull(expected.getMessage());
+        }
+
+        Player loaded = repository.load("Hero");
+        assertEquals("the earlier strength is still there", 1, loaded.getStats().getStrength());
+        assertEquals("village", loaded.getCurrentNodeId());
+        List<Item> inventory = loaded.getInventory();
+        assertEquals(1, inventory.size());
+        assertEquals("iron_sword", inventory.get(0).getId());
+        assertTrue("auto-commit is switched back on after the failure", database.connection().getAutoCommit());
+    }
+
+    @Test
+    public void saveAndLoad_afterTheConnectionIsClosed_reportSaveDataException() throws Exception {
+        database.connection().close();
+
+        try {
+            repository.save(new Player("Hero", new Stats(0, 0, 0), "village"), "Hero");
+            fail("a closed connection cannot save");
+        } catch (SaveDataException expected) {
+            assertTrue(expected.getMessage().contains("Hero"));
+        }
+        try {
+            repository.load("Hero");
+            fail("a closed connection cannot load");
+        } catch (SaveDataException expected) {
+            assertTrue(expected.getMessage().contains("Hero"));
+        }
+    }
 }
