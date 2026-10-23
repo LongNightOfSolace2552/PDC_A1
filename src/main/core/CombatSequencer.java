@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 import javax.swing.Timer;
 
 /* 
-Runs a resolved battle sequence on a background timer, feeding each 
-BattleAction's dialogue to the CombatRenderer one at a time with a short delay 
-between lines, so dialogue displays progressively rather than all at once. It
-now uses a Swing Timer instead of a sleeping thread, which would freeze the window.
+Plays a fight's dialogue lines on the fight screen one at a time, with a
+short delay between lines, so the fight reads progressively instead of
+all at once. It uses a Swing Timer, which fires on the Swing thread and
+does not freeze the window the way a sleeping thread would.
 */
 public class CombatSequencer {
     /*millisecond, constant; always 1000 ms which is equals 1 second*/

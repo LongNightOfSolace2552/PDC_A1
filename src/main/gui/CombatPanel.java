@@ -16,11 +16,10 @@ import main.domain.combat.Enemy;
 import main.domain.player.Player;
 
 /*
-the fight screen (the GUI's CombatRenderer): the fight is resolved
-straight away, then CombatSequencer hands its dialogue lines over one at
-a time. each line is added to the log and moves the sprites on the
-BattleStagePanel. Skip shows the rest at once; Continue hands the result
-back to the caller.
+the fight screen (the GUI's CombatRenderer): the fight is resolved straight 
+away, then CombatSequencer hands its dialogue lines over one at a time. 
+each line is added to the log and moves the sprites on the BattleDisplayPanel. 
+Skip shows the rest at once; Continue hands the result back to the caller.
 */
 public class CombatPanel extends JPanel {
     private final BattleDisplayPanel stage = new BattleDisplayPanel();

@@ -21,7 +21,10 @@ import java.util.Objects;
 import main.domain.combat.FightOutcome;
 import main.services.ActionResult;
 
-/* orchestrates services and CUI rendering in response to player actions. */
+/*
+decides whether each player action is allowed (PASS or FAIL) and applies it, 
+using the services.
+*/
 public class GameController {
 
      private final SaveManager saveManager;

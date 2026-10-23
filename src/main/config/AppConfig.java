@@ -1,7 +1,7 @@
 package main.config;
 
-/*removed all the cui required imports, some files like renderers is not needed
-as it is rendered in a GUI now.*/
+/*builds the whole game: opens the Derby database, loads the game data and 
+wires the services together.*/
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;

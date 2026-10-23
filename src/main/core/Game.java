@@ -42,7 +42,7 @@ public class Game {
         return gameController;
     }
 
-    /* opens the game window on the Swing thread (Part 1's start() ran the console loop here). */
+    /* opens the game window on the Swing thread.*/
     public void start() {
         SwingUtilities.invokeLater(() -> new GameFrame(this).setVisible(true));
     }
