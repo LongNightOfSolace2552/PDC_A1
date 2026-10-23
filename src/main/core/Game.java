@@ -1,5 +1,6 @@
 package main.core;
 
+/*Game and CombatSequencer imports Swing from core/ */
 import java.util.Map;
 import javax.swing.SwingUtilities;
 import main.domain.items.Item;
