@@ -3,7 +3,7 @@ package main;
 /*
 included atomic boolean, this is a specialized boolean value that allows
 it to read and be updated atomically (does it singly and indivisbly step without the use of synchronization for
-multi-threading
+multi-threading.
 */
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JOptionPane;
