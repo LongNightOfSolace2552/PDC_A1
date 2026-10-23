@@ -61,9 +61,111 @@ public class GameControllerDungeonTest {
         Map<String, Boss> bosses = new HashMap<>();
         bosses.put("village", chieftain);
         bosses.put("tower", chieftain);
- 
-       /*plan on adding test case for enemy, enemy boss and randomization*/
+
+        /*
+        only the enemy pools, bosses and randomizer matter here; save, 
+        travel and combat are left out.
+        */
+        controller = new GameController(null, null, null, pools, bosses, new ZeroRandomizer());
+        player = new Player("Hero", new Stats(0, 0, 0), "village");
+    }
+
+    private Node node(String id, String name, boolean hasBoss) {
+        return new Node(id, new NodeLocation(id, name, "..."), 1, hasBoss);
     }
     
-    /*continue here*/
+    /*function names are named exactly what it describes to test.*/
+    
+    @Test
+    public void hasEnemies_isTrueOnlyForNodesWithAnEnemyPool() {
+        assertTrue(controller.hasEnemies("village"));
+        assertTrue(controller.hasEnemies("meadow"));
+        assertFalse(controller.hasEnemies("tower"));
+        assertFalse("an unknown node has no enemies", controller.hasEnemies("nowhere"));
+    }
+
+    @Test
+    public void handleDungeon_passesForANodeWithEnemies() {
+        assertTrue(controller.handleDungeon(withEnemiesOnly).isPass());
+    }
+
+    @Test
+    public void handleDungeon_passesForANodeWithOnlyABoss() {
+        assertTrue(controller.handleDungeon(withBossOnly).isPass());
+    }
+
+    @Test
+    public void handleDungeon_failsWhenThereIsNothingToFight() {
+        ActionResult result = controller.handleDungeon(withNothing);
+
+        assertTrue(result.isFail());
+        assertEquals("There is nothing to fight here yet.", result.getMessage());
+    }
+
+    @Test
+    public void createDungeon_startsAFreshDungeonAtFloorOne() {
+        Dungeon dungeon = controller.createDungeon(withEnemiesAndBoss);
+
+        assertEquals(1, dungeon.getFloor());
+        assertEquals("village", dungeon.getNodeId());
+        assertEquals("Slime", dungeon.nextEnemy().getName());
+    }
+
+    @Test
+    public void handleBossChallenge_passesWithTheBossIntroduction() {
+        ActionResult result = controller.handleBossChallenge(player, withEnemiesAndBoss);
+
+        assertTrue(result.isPass());
+        assertEquals("A Village Chieftain blocks your path.", result.getMessage());
+    }
+    
+    @Test
+    public void handleBossChallenge_failsOnceTheBossIsDefeated() {
+        player.markBossDefeated("village");
+
+        ActionResult result = controller.handleBossChallenge(player, withEnemiesAndBoss);
+
+        assertTrue(result.isFail());
+        assertEquals("You have already defeated this node's boss.", result.getMessage());
+    }
+    
+    @Test
+    public void handleBossChallenge_failsOnANodeWithoutABoss() {
+        ActionResult result = controller.handleBossChallenge(player, withEnemiesOnly);
+
+        assertTrue(result.isFail());
+        assertEquals("This node has no boss.", result.getMessage());
+    }
+
+    @Test
+    public void handleBossChallenge_failsWhenTheBossDataIsMissing() {
+        ActionResult result = controller.handleBossChallenge(player, bossMissingFromData);
+
+        assertTrue(result.isFail());
+        assertEquals("This node's boss data could not be found.", result.getMessage());
+    }
+
+    @Test
+    public void getBoss_returnsTheNodesBossOrNull() {
+        assertSame(chieftain, controller.getBoss("village"));
+        assertNull(controller.getBoss("meadow"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void handleDungeon_withoutANode_isRejected() {
+        controller.handleDungeon(null);
+    }
+
+    /* always rolls 0: every floor needs the minimum number of enemies and the first enemy in a pool is picked. */
+    private static class ZeroRandomizer extends Randomizer {
+        @Override
+        public double nextDouble() {
+            return 0.0;
+        }
+
+        @Override
+        public int nextInt(int bound) {
+            return 0;
+        }
+    }
 }
