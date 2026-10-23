@@ -70,4 +70,12 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+    <!--
+    the Swing GUI is the game's only front-end: the default "run" target
+    launches main.App, which opens it. "run-gui" is kept as an alias so
+    either command works. Working directory is the project root, so the
+    embedded Derby database folder RPGDB/ is created and found there.
+    -->
+    <target name="run-gui" depends="run" description="Alias for run: starts the Swing GUI."/>
 </project>

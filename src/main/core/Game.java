@@ -18,6 +18,8 @@ existing save or creating a new character). the GameController it holds
 runs the game from then on.
 */
 public class Game {
+    /* the longest name the database's PLAYER.NAME column (VARCHAR(50)) can hold. */
+    public static final int MAX_NAME_LENGTH = 50;
     private static final int DEFAULT_STAT_VALUE = 0;
     private static final String DEFAULT_STARTING_NODE_ID = "village";
     /*
@@ -48,12 +50,16 @@ public class Game {
     /*
     an existing save for the name is loaded; no save, or one that cannot
     be read, starts a new character with the starter items equipped. a
-    blank name FAILs. (the name prompt itself is now the GUI's.)
+    blank name, or one longer than MAX_NAME_LENGTH, FAILs. (the name
+    prompt itself is now the GUI's.)
     */
     public SessionStart initializePlayer(String playerName) {
         String name = playerName == null ? "" : playerName.trim();
         if (name.isEmpty()) {
             return SessionStart.failed("Please enter a name.");
+        }
+        if (name.length() > MAX_NAME_LENGTH) {
+            return SessionStart.failed("Please use a name of " + MAX_NAME_LENGTH + " characters or fewer.");
         }
 
         String notice = "";
