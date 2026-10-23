@@ -210,6 +210,21 @@ public class PlayerDatabaseRepositoryTest {
         assertEquals("iron_sword", inventory.get(0).getId());
         assertTrue("auto-commit is switched back on after the failure", database.connection().getAutoCommit());
     }
+    
+    /*added this test case here for an unknown node and refuse to save if so.*/
+    @Test
+    public void save_toAnUnknownNode_isRefusedAndNothingIsSaved() throws SaveDataException {
+        Player player = new Player("Hero", new Stats(0, 0, 0), "atlantis");
+
+        try {
+            repository.save(player, "Hero");
+            fail("the node must exist");
+        } catch (SaveDataException expected) {
+            assertNotNull(expected.getMessage());
+        }
+
+        assertFalse(repository.saveExists("Hero"));
+    }
 
     @Test
     public void saveAndLoad_afterTheConnectionIsClosed_reportSaveDataException() throws Exception {
