@@ -8,6 +8,14 @@ import javax.swing.Timer;
 holds the screen being shown and swaps it for the next one with a short
 slide from the right, so moving between screens is smooth instead of an
 instant jump. a Swing Timer drives it; no animation library.
+
+How it works is that, it starts the next screen off the right edge and a Swing
+Timer is used to then tick down every 20 ms for 10 frames (which is about 0.2
+seconds). On each tick the placeScreens() function shifts both screens to the
+left by "width * frame / 10" in which results in the current screen slides out
+and the new one slides in. If another button is somehow clicked in the middle
+of an animation, the function; "finishSlide()" is called and ends the animation
+right away, this is so that animation cannot pile up.
 */
 public class TransitionPanel extends JPanel {
     /*sets the frames of transitions*/
