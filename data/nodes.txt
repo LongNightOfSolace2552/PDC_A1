@@ -1,5 +1,0 @@
-# Node progression and per-node enemy pool data goes here
-# id|locationId|difficulty|hasBoss
-village|village|1|true
-forest|forest|3|true
-cave|cave|5|true

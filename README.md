@@ -51,8 +51,7 @@ Each player profile is a row in the embedded Apache Derby database (`PLAYER`, wi
 
 ## Project Structure
 
-- `data/` - The Part 1 text files (items, enemies, nodes, dialogue templates, one save per profile). The game no longer reads them: its data is inserted into the Derby database the first time it runs, and `FileRepositoryTest` still uses the old file DAOs.
-- `RPGDB/` - the embedded Derby database, created next to the project the first time the game runs (together with `derby.log`). Both are git-ignored; delete `RPGDB/` to start from a fresh database.
+- `RPGDB/` - The embedded Derby database, created on the first run in the project root (git-ignored).
 - `lib/` - `derby.jar` (Apache Derby 10.14.2.0, embedded) used by the game, and JUnit 4.13.2 and Hamcrest 1.3 used by the test source root.
 - `nbproject/` - NetBeans project metadata.
 - `src/main/` - Application source, under the `main` package (and subpackages matching folder structure):

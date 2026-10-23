@@ -1,5 +1,0 @@
-# Node location/place data goes here
-# id|name|description
-village|Starting Village|A quiet village where new adventurers begin their journey.
-forest|Whispering Forest|A dense forest said to hide ancient ruins and restless spirits.
-cave|Shadow Cave|A dark cave echoing with distant growls.
